@@ -5,14 +5,16 @@
         type="text" 
         class="form-control" 
         placeholder="Buscar entradas"
+        v-model="term"
         >
 
     </div>
     <div class="entry-scrollarea">
         <Entry
-            v-for="item in 100"
-            :key="item" />
-
+            v-for="entry in entriesbyTerm"
+            :key="entry.id"
+            :entry="entry" />
+           
     </div>
 
   </div>
@@ -20,9 +22,24 @@
 
 <script>
 import { defineAsyncComponent } from "vue";
+import { mapGetters } from "vuex";
+
 export default {
     components:{
         Entry: defineAsyncComponent(()=> import('@/modules/daybook/component/Entry.vue'))
+    },
+    computed:{
+
+        // saca del state todas las propiedades que vayamos a utilizar en este caso el count
+        ...mapGetters('journal',['getEntriesbyTerm']),
+        entriesbyTerm(){
+            return this.getEntriesbyTerm(this.term)
+        }
+    },
+    data(){
+        return{
+            term:''
+        }
     }
 }
 </script>
