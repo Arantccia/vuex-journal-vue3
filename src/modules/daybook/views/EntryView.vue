@@ -28,14 +28,31 @@
         class="img-thumbnail"
         >
     </template>
-    <Fab icon="fa-save" />
+<!--      <Fab 
+        icon="fa-save"
+        @on:click="saveEntry"
+    /> -->
+    <!--No utilizar esta!!! ya que ataca al punto de referencia y 
+        no sabe cual componente se ha cargado -->
+<!--     <Fab 
+        icon="fa-save"
+        :saveEntryApply="saveEntry"
+    /> -->
+    <Fab 
+        icon="fa-save"
+        @on:saveEntry="saveEntry"
+    /> 
+   
+         
+
     
 </template>
 
 <script>
 import { defineAsyncComponent } from '@vue/runtime-core'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import getDayMonthYear from "../helpers/getDayMonthYear";
+import { conditionalExpression } from '@babel/types';
 
 
 export default {
@@ -70,10 +87,31 @@ export default {
         },
     }, 
     methods:{
+        ...mapActions('journal', ['updateEntry', 'createEntry']),
         loadEntry(){
-            const entry = this.getEntrybyId(this.id)
-            if( !entry) return this.$router.push({name:'no-entry'})
+            let entry;
+            if(this.id === 'new'){
+                entry ={
+                    text:'',
+                    date: new Date().getTime()
+                }
+            }else{
+                entry = this.getEntrybyId(this.id)
+                if( !entry) return this.$router.push({name:'no-entry'})
+            }
+           
             this.entry = entry
+        },
+        async saveEntry(){
+            if(this.entry.id){
+               await  this.updateEntry(this.entry)
+           
+            }else{
+                const data=  await this.createEntry(this.entry)
+                this.$router.push({name:'entry', params:{id:data}})
+            }
+             
+             
         }
     },
     created(){
