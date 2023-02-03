@@ -31,11 +31,12 @@
         <div class="d-flex flex-column px-3 h-75">
             <textarea placeholder="Que sucedió hoy?" v-model="entry.text" />
         </div>
-      <!--   <img 
-        src="https://cdn.pixabay.com/photo/2016/11/08/04/49/jungle-1807476_1280.jpg" 
+        <img 
+        v-if="entry.picture && !localImage"
+        :src="entry.picture" 
         alt="entry-picture"
         class="img-thumbnail"
-        > -->
+        > 
 
         <img 
         v-if="localImage"
@@ -71,6 +72,7 @@ import Swal from 'sweetalert2'
 
 
 import getDayMonthYear from "../helpers/getDayMonthYear";
+import uploadImage from "../helpers/uploadImage";
 
 
 
@@ -112,11 +114,15 @@ export default {
         loadEntry(){
             let entry;
             if(this.id === 'new'){
+                this.localImage = null
+                this.file = null,
                 entry ={
                     text:'',
                     date: new Date().getTime()
                 }
             }else{
+                this.localImage = null
+                this.file = null
                 entry = this.getEntrybyId(this.id)
                 if( !entry) return this.$router.push({name:'no-entry'})
             }
@@ -129,6 +135,12 @@ export default {
                 allowOutsideClick: false
             })
             Swal.showLoading()
+            // nos devuelve la url de la imagen
+            const picture = await uploadImage(this.file)
+            console.log(picture)
+            // si retornara un null firebase no lo grbabría
+            this.entry.picture = picture
+            console.log(this.entry)
             if(this.entry.id){
                await  this.updateEntry(this.entry)
            
@@ -136,7 +148,9 @@ export default {
                 const id = await this.createEntry(this.entry)
                 this.$router.push({name:'entry', params:{id}})            
             }
+            this.file = null
             Swal.fire('Guardado','Se ha guardado correctamente', 'success')
+       
         },
         async onDeleteEntry(){
 
@@ -176,7 +190,7 @@ export default {
         },
         onSelectImage(){
            
-            this.$refs.imageSelector.click('input')
+            this.$refs.imageSelector.click()
            /*  
            esta seria la forma standar de hacerlo
            document.querySelector('input').click()
