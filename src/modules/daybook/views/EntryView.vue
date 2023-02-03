@@ -137,10 +137,10 @@ export default {
             Swal.showLoading()
             // nos devuelve la url de la imagen
             const picture = await uploadImage(this.file)
-            console.log(picture)
+           // console.log(picture)
             // si retornara un null firebase no lo grbabría
             this.entry.picture = picture
-            console.log(this.entry)
+            //console.log(this.entry)
             if(this.entry.id){
                await  this.updateEntry(this.entry)
            
@@ -194,7 +194,7 @@ export default {
            /*  
            esta seria la forma standar de hacerlo
            document.querySelector('input').click()
-            */
+        */
 
         }
 
